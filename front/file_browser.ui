@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QDialogFileBrowser</class>
- <widget class="QDialog" name="QDialogFileBrowser">
+ <class>QDialogImportBrowser</class>
+ <widget class="QDialog" name="QDialogImportBrowser">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,7 +29,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Import z pliku .csv</string>
+  </property>
+  <property name="locale">
+   <locale language="Polish" country="Poland"/>
   </property>
   <widget class="QFrame" name="frameFilepath">
    <property name="geometry">
@@ -62,7 +65,7 @@
        </size>
       </property>
       <property name="placeholderText">
-       <string>Podaj ścieżkę do pliku...</string>
+       <string>Ścieżka do importowanego pliku...</string>
       </property>
      </widget>
     </item>
@@ -81,6 +84,12 @@
     </item>
     <item>
      <widget class="QFrame" name="frame">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
