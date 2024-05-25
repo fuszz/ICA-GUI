@@ -9,12 +9,17 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from back.RichICA import RichICA
-import import_browser, export_browser
+from PyQt5.QtWidgets import QVBoxLayout, QFrame
 
+from back.richICA import RichICA
+import import_browser
+import export_browser
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        self.backend = RichICA()
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1017, 831)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -40,14 +45,14 @@ class Ui_MainWindow(object):
         self.frameUpper.setObjectName("frameUpper")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.frameUpper)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.frame_Parameters = QtWidgets.QFrame(self.frameUpper)
-        self.frame_Parameters.setMinimumSize(QtCore.QSize(200, 0))
-        self.frame_Parameters.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_Parameters.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_Parameters.setObjectName("frame_Parameters")
-        self.gridLayout = QtWidgets.QGridLayout(self.frame_Parameters)
+        self.frameParameters = QtWidgets.QFrame(self.frameUpper)
+        self.frameParameters.setMinimumSize(QtCore.QSize(200, 0))
+        self.frameParameters.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameParameters.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameParameters.setObjectName("frameParameters")
+        self.gridLayout = QtWidgets.QGridLayout(self.frameParameters)
         self.gridLayout.setObjectName("gridLayout")
-        self.frameParSampling = QtWidgets.QFrame(self.frame_Parameters)
+        self.frameParSampling = QtWidgets.QFrame(self.frameParameters)
         self.frameParSampling.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameParSampling.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameParSampling.setObjectName("frameParSampling")
@@ -64,7 +69,7 @@ class Ui_MainWindow(object):
         self.spinBoxSampling.setObjectName("spinBoxSampling")
         self.horizontalLayout_8.addWidget(self.spinBoxSampling)
         self.gridLayout.addWidget(self.frameParSampling, 1, 0, 1, 1)
-        self.frameParSelectEnd = QtWidgets.QFrame(self.frame_Parameters)
+        self.frameParSelectEnd = QtWidgets.QFrame(self.frameParameters)
         self.frameParSelectEnd.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameParSelectEnd.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameParSelectEnd.setObjectName("frameParSelectEnd")
@@ -79,7 +84,7 @@ class Ui_MainWindow(object):
         self.doubleSpinBoxSelEnd.setObjectName("doubleSpinBoxSelEnd")
         self.horizontalLayout_9.addWidget(self.doubleSpinBoxSelEnd)
         self.gridLayout.addWidget(self.frameParSelectEnd, 4, 0, 1, 1)
-        self.frameParFilename = QtWidgets.QFrame(self.frame_Parameters)
+        self.frameParFilename = QtWidgets.QFrame(self.frameParameters)
         self.frameParFilename.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameParFilename.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameParFilename.setObjectName("frameParFilename")
@@ -104,7 +109,7 @@ class Ui_MainWindow(object):
         self.textFilename.setObjectName("textFilename")
         self.horizontalLayout_10.addWidget(self.textFilename)
         self.gridLayout.addWidget(self.frameParFilename, 0, 0, 1, 1)
-        self.frameParSampleNum = QtWidgets.QFrame(self.frame_Parameters)
+        self.frameParSampleNum = QtWidgets.QFrame(self.frameParameters)
         self.frameParSampleNum.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameParSampleNum.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameParSampleNum.setObjectName("frameParSampleNum")
@@ -119,7 +124,7 @@ class Ui_MainWindow(object):
         self.spinBoxSampleNum.setObjectName("spinBoxSampleNum")
         self.horizontalLayout_11.addWidget(self.spinBoxSampleNum)
         self.gridLayout.addWidget(self.frameParSampleNum, 2, 0, 1, 1)
-        self.frameParSelectBeg = QtWidgets.QFrame(self.frame_Parameters)
+        self.frameParSelectBeg = QtWidgets.QFrame(self.frameParameters)
         self.frameParSelectBeg.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameParSelectBeg.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameParSelectBeg.setObjectName("frameParSelectBeg")
@@ -134,14 +139,14 @@ class Ui_MainWindow(object):
         self.doubleSpinBoxSelBeg.setObjectName("doubleSpinBoxSelBeg")
         self.horizontalLayout_12.addWidget(self.doubleSpinBoxSelBeg)
         self.gridLayout.addWidget(self.frameParSelectBeg, 3, 0, 1, 1)
-        self.horizontalLayout_7.addWidget(self.frame_Parameters)
-        self.frame_Buttons = QtWidgets.QFrame(self.frameUpper)
-        self.frame_Buttons.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_Buttons.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_Buttons.setObjectName("frame_Buttons")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.frame_Buttons)
+        self.horizontalLayout_7.addWidget(self.frameParameters)
+        self.frameButtons = QtWidgets.QFrame(self.frameUpper)
+        self.frameButtons.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameButtons.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameButtons.setObjectName("frameButtons")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.frameButtons)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.pButtnImport = QtWidgets.QPushButton(self.frame_Buttons)
+        self.pButtnImport = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -150,7 +155,7 @@ class Ui_MainWindow(object):
         self.pButtnImport.setMaximumSize(QtCore.QSize(16777215, 50))
         self.pButtnImport.setObjectName("pButtnImport")
         self.verticalLayout_3.addWidget(self.pButtnImport)
-        self.pButtnExport = QtWidgets.QPushButton(self.frame_Buttons)
+        self.pButtnExport = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -159,7 +164,7 @@ class Ui_MainWindow(object):
         self.pButtnExport.setMaximumSize(QtCore.QSize(16777215, 50))
         self.pButtnExport.setObjectName("pButtnExport")
         self.verticalLayout_3.addWidget(self.pButtnExport)
-        self.pButtnSel = QtWidgets.QPushButton(self.frame_Buttons)
+        self.pButtnSel = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -169,7 +174,7 @@ class Ui_MainWindow(object):
         self.pButtnSel.setMaximumSize(QtCore.QSize(16777215, 50))
         self.pButtnSel.setObjectName("pButtnSel")
         self.verticalLayout_3.addWidget(self.pButtnSel)
-        self.pButtnICARun = QtWidgets.QPushButton(self.frame_Buttons)
+        self.pButtnICARun = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -178,28 +183,31 @@ class Ui_MainWindow(object):
         self.pButtnICARun.setMaximumSize(QtCore.QSize(16777215, 50))
         self.pButtnICARun.setObjectName("pButtnICARun")
         self.verticalLayout_3.addWidget(self.pButtnICARun)
-        self.horizontalLayout_7.addWidget(self.frame_Buttons)
+        self.horizontalLayout_7.addWidget(self.frameButtons)
         self.verticalLayout_6.addWidget(self.frameUpper)
-        self.frameOscilogram = QtWidgets.QFrame(self.centralwidget)
+        self.frameOscillogram = QtWidgets.QFrame(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.frameOscilogram.sizePolicy().hasHeightForWidth())
-        self.frameOscilogram.setSizePolicy(sizePolicy)
-        self.frameOscilogram.setMinimumSize(QtCore.QSize(300, 200))
-        self.frameOscilogram.setSizeIncrement(QtCore.QSize(500, 200))
-        self.frameOscilogram.setBaseSize(QtCore.QSize(500, 200))
-        self.frameOscilogram.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameOscilogram.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frameOscilogram.setObjectName("frameOscilogram")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frameOscilogram)
+        sizePolicy.setHeightForWidth(self.frameOscillogram.sizePolicy().hasHeightForWidth())
+        self.frameOscillogram.setSizePolicy(sizePolicy)
+        self.frameOscillogram.setMinimumSize(QtCore.QSize(300, 200))
+        self.frameOscillogram.setSizeIncrement(QtCore.QSize(500, 200))
+        self.frameOscillogram.setBaseSize(QtCore.QSize(500, 200))
+        self.frameOscillogram.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameOscillogram.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameOscillogram.setObjectName("frameOscillogram")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frameOscillogram)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.widgetOscilogram = QtWidgets.QWidget(self.frameOscilogram)
-        self.widgetOscilogram.setBaseSize(QtCore.QSize(0, 0))
-        self.widgetOscilogram.setStyleSheet("background-color: rgb(0, 0, 0);")
-        self.widgetOscilogram.setObjectName("widgetOscilogram")
-        self.verticalLayout_4.addWidget(self.widgetOscilogram)
-        self.verticalLayout_6.addWidget(self.frameOscilogram)
+
+        self.widgetOscillogram = QtWidgets.QWidget(self.frameOscillogram)
+        self.widgetOscillogram.setBaseSize(QtCore.QSize(0, 0))
+        self.widgetOscillogram.setObjectName("widgetOscillogram")
+        self.reload_oscillogram()
+
+        self.verticalLayout_4.addWidget(self.widgetOscillogram)
+        self.verticalLayout_6.addWidget(self.frameOscillogram)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -208,8 +216,19 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Backend handler
-        self.backend = RichICA()
+        self.frameOscillogram.setFrameStyle(QFrame.NoFrame)
+        self.frameUpper.setFrameStyle(QFrame.NoFrame)
+        self.frameParFilename.setFrameStyle(QFrame.NoFrame)
+        self.frameParSampling.setFrameStyle(QFrame.NoFrame)
+        self.frameParSelectBeg.setFrameStyle(QFrame.NoFrame)
+        self.frameParSelectEnd.setFrameStyle(QFrame.NoFrame)
+        self.frameParSampleNum.setFrameStyle(QFrame.NoFrame)
+
+
+        self.pButtnSel.clicked.connect(self.on_click_pButtnSel)
+        self.pButtnImport.clicked.connect(self.on_click_pButtnImport)
+        self.pButtnExport.clicked.connect(self.on_click_pButtnExport)
+        self.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
 
 
     def retranslateUi(self, MainWindow):
@@ -226,10 +245,6 @@ class Ui_MainWindow(object):
         self.pButtnSel.setText(_translate("MainWindow", "Wskaż fragment"))
         self.pButtnICARun.setText(_translate("MainWindow", "Uruchom ICA"))
 
-        self.pButtnSel.clicked.connect(self.on_click_pButtnSel)
-        self.pButtnImport.clicked.connect(self.on_click_pButtnImport)
-        self.pButtnExport.clicked.connect(self.on_click_pButtnExport)
-        self.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
 
 
     def on_click_pButtnImport(self):
@@ -240,6 +255,7 @@ class Ui_MainWindow(object):
     def handle_import_filepath(self, value):
         self.textFilename.setPlainText(value)
         self.backend.set_importedFilename(value)
+        print("Importing file:", value)
         # !!! Tutaj wstawić metode, która wczytuje plik .csv
 
     def on_click_pButtnExport(self):
@@ -248,17 +264,21 @@ class Ui_MainWindow(object):
         self.exportBrowserWindow.fileSaveRequested.connect(self.handle_save_request)
 
     def handle_save_request(self, value):
-        self.textFilename.setPlainText(value)
         self.backend.set_importedFilename(value)
-        #print("Need to save ", value) DZIAŁA
+        print("Need to save ", value)  # DZIAŁA
         # Tutaj wstawić metodę, która przekazuje wartość do pliku .csv
 
     def on_click_pButtnSel(self):
         print("Wciśnięto wskaż fragment")
+        self.reload_oscillogram()
 
     def on_click_pButtnICARun(self):
         print("Wciśnięto ICA Run")
 
+    def reload_oscillogram(self):
+        print("przeładowanie widgetu oscylogram")
+        self.widgetOscillogram = self.backend.get_widget()
+        self.widgetOscillogram.update()
 
 if __name__ == "__main__":
     import sys
