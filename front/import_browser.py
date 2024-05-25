@@ -13,14 +13,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QDialog, QFileDialog
 
-class Ui_QDialogImportBrowser(QDialog):
 
+class Ui_QDialogImportBrowser(QDialog):
     filepath_signal = pyqtSignal(str)
 
     def __init__(self):
         self.filepath = ""
         super().__init__()
         self.setupUi(self)
+
     def setupUi(self, QDialogImportBrowser):
         QDialogImportBrowser.setObjectName("QDialogImportBrowser")
         QDialogImportBrowser.resize(525, 150)
@@ -79,7 +80,6 @@ class Ui_QDialogImportBrowser(QDialog):
         self.pButtnOk.clicked.connect(self.on_click_pButtnOk)
         self.pButtnCancel.clicked.connect(self.on_click_pButtnCancel)
 
-
     def on_click_pButtnBrowse(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(self, "", "Comma Separated Values Files (*.csv)", options=options)
@@ -87,7 +87,6 @@ class Ui_QDialogImportBrowser(QDialog):
             self.filepath = fileName
             self.providedFilepath.clear()
             self.providedFilepath.setPlainText(fileName)
-
 
     def on_click_pButtnOk(self):
         self.filepath_signal.emit(self.filepath)

@@ -9,17 +9,25 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QVBoxLayout, QFrame
-
-from back.richICA import RichICA
+from PyQt5.QtWidgets import QFrame
+from PyQt5.QtCore import pyqtSignal
+import sys
 import import_browser
-import export_browser
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+#import export_browser
+
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        self.backend = RichICA()
+    # DEKLARACJE SYGNAŁÓW
+    #   Żądanie przysłania widgetu z oscylogramem:
+    sigOscillogramRequest = pyqtSignal()
+    sigImportFileRequest = pyqtSignal(str)  # żądanie importu pliku - argumentem jest filename
+    sigExportFileRequest = pyqtSignal(str)  # analogicznie jak wyżej
 
+    sigIcaRunningRequest = pyqtSignal()  # żądanie uruchomienia algorytmu ICA
+
+    sigProvideSelectedRangeRequest = pyqtSignal()  # żądanie dostarczenia wybranego przez użytkownika zakresu
+
+    def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1017, 831)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -224,12 +232,10 @@ class Ui_MainWindow(object):
         self.frameParSelectEnd.setFrameStyle(QFrame.NoFrame)
         self.frameParSampleNum.setFrameStyle(QFrame.NoFrame)
 
-
         self.pButtnSel.clicked.connect(self.on_click_pButtnSel)
         self.pButtnImport.clicked.connect(self.on_click_pButtnImport)
         self.pButtnExport.clicked.connect(self.on_click_pButtnExport)
         self.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
-
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -245,46 +251,37 @@ class Ui_MainWindow(object):
         self.pButtnSel.setText(_translate("MainWindow", "Wskaż fragment"))
         self.pButtnICARun.setText(_translate("MainWindow", "Uruchom ICA"))
 
-
-
     def on_click_pButtnImport(self):
-        self.importBrowserWindow = import_browser.Ui_QDialogImportBrowser()
-        self.importBrowserWindow.show()
-        self.importBrowserWindow.filepath_signal.connect(self.handle_import_filepath)
+        importBrowserWindow = import_browser.Ui_QDialogImportBrowser()
+        importBrowserWindow.show()
+        importBrowserWindow.filepath_signal.connect(self.handle_import_filepath)
 
     def handle_import_filepath(self, value):
         self.textFilename.setPlainText(value)
-        self.backend.set_importedFilename(value)
+        self.sigImportFileRequest(value)
         print("Importing file:", value)
-        # !!! Tutaj wstawić metode, która wczytuje plik .csv
 
     def on_click_pButtnExport(self):
-        self.exportBrowserWindow = export_browser.Ui_QDialogExportBrowser()
-        self.exportBrowserWindow.show()
-        self.exportBrowserWindow.fileSaveRequested.connect(self.handle_save_request)
+        exportBrowserWindow = export_browser.Ui_QDialogExportBrowser()
+        exportBrowserWindow.show()
+        exportBrowserWindow.fileSaveRequested.connect(self.handle_export_request)
 
-    def handle_save_request(self, value):
-        self.backend.set_importedFilename(value)
+    def handle_export_request(self, value):
+        self.sigExportFileRequest.emit(value)
         print("Need to save ", value)  # DZIAŁA
         # Tutaj wstawić metodę, która przekazuje wartość do pliku .csv
 
     def on_click_pButtnSel(self):
+        self.sigProvideSelectedRangeRequest.emit()
         print("Wciśnięto wskaż fragment")
         self.reload_oscillogram()
 
-    def on_click_pButtnICARun(self):
-        print("Wciśnięto ICA Run")
-
     def reload_oscillogram(self):
         print("przeładowanie widgetu oscylogram")
-        self.widgetOscillogram = self.backend.get_widget()
+        self.sigOscillogramRequest.emit()
+        #self.widgetOscillogram = self.backend.get_widget() # Sygnał - żądanie nowego obrazu oscylogramu
         self.widgetOscillogram.update()
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    def on_click_pButtnICARun(self):
+        print("Zażądano uruchomienia algorytmu ICA")
+        self.sigIcaRunningRequest()

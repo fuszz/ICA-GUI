@@ -1,14 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import QVBoxLayout
-from matplotlib.widgets import SpanSelector, Slider
-from matplotlib.figure import Figure
+from matplotlib.widgets import SpanSelector
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas,
                                                 NavigationToolbar2QT as NavigationToolbar)
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 
 class OscillogramMpl(FigureCanvas):
+
+    sel_range = pyqtSignal(float, float)
+
     def __init__(self, parent=None):
         fig, self.ax = plt.subplots()
         FigureCanvas.__init__(self, fig)
@@ -21,6 +24,7 @@ class OscillogramMpl(FigureCanvas):
 
         # Funkcja wywoływana po zaznaczeniu obszaru
         def onselect(min, max):
+            self.sel_range.emit(min, max)
             print(f"Zaznaczony obszar od {min} do {max}")
 
         self.span = SpanSelector(self.ax, onselect, 'horizontal', useblit=True)
