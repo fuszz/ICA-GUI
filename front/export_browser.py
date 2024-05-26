@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'front/export_browser.ui'
+# Form implementation generated from reading ui file 'front/des_export_browser.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #

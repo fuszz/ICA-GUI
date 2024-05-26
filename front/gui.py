@@ -9,25 +9,19 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFrame
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal
-import sys
-import import_browser
-#import export_browser
-
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+import front.import_browser as import_browser
+import front.export_browser as export_browser
+import front.oscillogramMpl as oscillogramMpl
 
 class Ui_MainWindow(object):
-    # DEKLARACJE SYGNAŁÓW
-    #   Żądanie przysłania widgetu z oscylogramem:
-    sigOscillogramRequest = pyqtSignal()
-    sigImportFileRequest = pyqtSignal(str)  # żądanie importu pliku - argumentem jest filename
-    sigExportFileRequest = pyqtSignal(str)  # analogicznie jak wyżej
 
-    sigIcaRunningRequest = pyqtSignal()  # żądanie uruchomienia algorytmu ICA
-
-    sigProvideSelectedRangeRequest = pyqtSignal()  # żądanie dostarczenia wybranego przez użytkownika zakresu
 
     def setupUi(self, MainWindow):
+
+        super(Ui_MainWindow, self).__init__()
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1017, 831)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -211,7 +205,6 @@ class Ui_MainWindow(object):
         self.widgetOscillogram = QtWidgets.QWidget(self.frameOscillogram)
         self.widgetOscillogram.setBaseSize(QtCore.QSize(0, 0))
         self.widgetOscillogram.setObjectName("widgetOscillogram")
-        self.reload_oscillogram()
 
         self.verticalLayout_4.addWidget(self.widgetOscillogram)
         self.verticalLayout_6.addWidget(self.frameOscillogram)
@@ -231,11 +224,8 @@ class Ui_MainWindow(object):
         self.frameParSelectBeg.setFrameStyle(QFrame.NoFrame)
         self.frameParSelectEnd.setFrameStyle(QFrame.NoFrame)
         self.frameParSampleNum.setFrameStyle(QFrame.NoFrame)
+        self.prepare_oscillogram()
 
-        self.pButtnSel.clicked.connect(self.on_click_pButtnSel)
-        self.pButtnImport.clicked.connect(self.on_click_pButtnImport)
-        self.pButtnExport.clicked.connect(self.on_click_pButtnExport)
-        self.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -251,20 +241,62 @@ class Ui_MainWindow(object):
         self.pButtnSel.setText(_translate("MainWindow", "Wskaż fragment"))
         self.pButtnICARun.setText(_translate("MainWindow", "Uruchom ICA"))
 
+
+    def prepare_oscillogram(self):
+        pass
+        self.oscillogramPyPlot = oscillogramMpl.OscillogramMpl()
+        self.toolbarPyPlot = NavigationToolbar(self.oscillogramPyPlot, self.widgetOscillogram)
+        self.layoutInOscillogram = QVBoxLayout(self.widgetOscillogram)
+        self.layoutInOscillogram.addWidget(self.toolbarPyPlot)
+        self.layoutInOscillogram.addWidget(self.oscillogramPyPlot)
+
+
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    # DEKLARACJE SYGNAŁÓW
+    #   Żądanie przysłania widgetu z oscylogramem:
+    sigImportFileRequest = pyqtSignal(str)  # żądanie importu pliku - argumentem jest filename
+    sigExportFileRequest = pyqtSignal(str)  # analogicznie jak wyżej
+
+    sigIcaRunningRequest = pyqtSignal()  # żądanie uruchomienia algorytmu ICA
+
+    sigProvideSelectedRangeRequest = pyqtSignal()  # żądanie dostarczenia wybranego przez użytkownika zakresu
+
+    sigSamplingSet = pyqtSignal(int)
+    sigSampleNumSet = pyqtSignal(int)
+    sigSelBegSet = pyqtSignal(float)
+    sigSelEndSet = pyqtSignal(float)
+
+
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.ui.pButtnSel.clicked.connect(self.on_click_pButtnSel)
+        self.ui.pButtnImport.clicked.connect(self.on_click_pButtnImport)
+        self.ui.pButtnExport.clicked.connect(self.on_click_pButtnExport)
+        self.ui.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
+
+        self.ui.spinBoxSampling.valueChanged.connect(self.vchange_Sampling)
+        self.ui.spinBoxSampleNum.valueChanged.connect(self.vchange_SampleNum)
+        self.ui.doubleSpinBoxSelBeg.valueChanged.connect(self.vchange_SelBeg)
+        self.ui.doubleSpinBoxSelEnd.valueChanged.connect(self.vchange_SelEnd)
+        self.ui.oscillogramPyPlot.sel_range.connect(self.set_selected_range_from_plt)
+
     def on_click_pButtnImport(self):
-        importBrowserWindow = import_browser.Ui_QDialogImportBrowser()
-        importBrowserWindow.show()
-        importBrowserWindow.filepath_signal.connect(self.handle_import_filepath)
+        self.importBrowserWindow = import_browser.Ui_QDialogImportBrowser()
+        self.importBrowserWindow.show()
+        self.importBrowserWindow.filepath_signal.connect(self.handle_import_filepath)
 
     def handle_import_filepath(self, value):
-        self.textFilename.setPlainText(value)
-        self.sigImportFileRequest(value)
+        self.ui.textFilename.setPlainText(value)
+        self.sigImportFileRequest.emit(value)
         print("Importing file:", value)
 
     def on_click_pButtnExport(self):
-        exportBrowserWindow = export_browser.Ui_QDialogExportBrowser()
-        exportBrowserWindow.show()
-        exportBrowserWindow.fileSaveRequested.connect(self.handle_export_request)
+        self.exportBrowserWindow = export_browser.Ui_QDialogExportBrowser()
+        self.exportBrowserWindow.show()
+        self.exportBrowserWindow.fileSaveRequested.connect(self.handle_export_request)
 
     def handle_export_request(self, value):
         self.sigExportFileRequest.emit(value)
@@ -274,14 +306,32 @@ class Ui_MainWindow(object):
     def on_click_pButtnSel(self):
         self.sigProvideSelectedRangeRequest.emit()
         print("Wciśnięto wskaż fragment")
-        self.reload_oscillogram()
 
-    def reload_oscillogram(self):
-        print("przeładowanie widgetu oscylogram")
-        self.sigOscillogramRequest.emit()
-        #self.widgetOscillogram = self.backend.get_widget() # Sygnał - żądanie nowego obrazu oscylogramu
-        self.widgetOscillogram.update()
 
     def on_click_pButtnICARun(self):
         print("Zażądano uruchomienia algorytmu ICA")
-        self.sigIcaRunningRequest()
+        self.sigIcaRunningRequest.emit()
+
+
+    def vchange_SelBeg(self, value):
+        self.sigSelBegSet.emit(value)
+
+    def vchange_SampleNum(self, value):
+        self.sigSampleNumSet.emit(value)
+
+    def vchange_SelEnd(self, value):
+        self.sigSelEndSet.emit(value)
+
+    def vchange_Sampling(self, value):
+        self.sigSamplingSet.emit(value)
+
+    def set_selected_range(self, beg, end):
+        self.ui.doubleSpinBoxSelBeg = beg
+        self.ui.doubleSpinBoxSelEnd = end
+        print(beg, end)
+
+    def set_selected_range_from_plt(self, beg, end):
+        self.ui.doubleSpinBoxSelBeg.setValue(beg)
+        self.ui.doubleSpinBoxSelEnd.setValue(end)
+        self.vchange_SelBeg(beg)
+        self.vchange_SelEnd(end)
