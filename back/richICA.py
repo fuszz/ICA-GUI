@@ -1,52 +1,40 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5 import QtWidgets
 import front.oscillogramMpl as oscillogramMpl
+import pandas as pd
+import back.csv_handling as csv
+import front.oscillogramMpl as oscillogram
 
 
 class RichICA(QThread):
     sigLastSelectedRange = pyqtSignal(float, float)
-    sigSendingOscillogram = pyqtSignal(QtWidgets.QWidget)
+    sigSendingDataframe = pyqtSignal(pd.DataFrame)
 
     def __init__(self):
         QThread.__init__(self)
 
         self.importedFilename = ""
 
-        self.lastSelectionBegin = 0.0
-        self.lastSelectionEnd = 0.0
+        self.selectionBegin = 0.0
+        self.selectionEnd = 0.0
 
-        self.confirmedSelectionBegin = 0.0
-        self.confirmedSelectionEnd = 0.0
-
-        # Obsługa oscylogramów jest jeszcze zdecydowanie do dopisania!!!
         self.oscillogram = oscillogramMpl.OscillogramMpl()
-        self.oscillogramData = 0  # To do zmiany potem
+        self.data = pd.DataFrame()
 
         self.sampling = 0
         self.sampleNum = 0
 
-    def run(self):
-        while True:
-            pass
+   # def run(self):
+   #     while True:
+   #         pass
+
     def import_file(self, filename):
         self.importedFilename = filename
-        # Wczytywanie danych z pliku .csv
-
-    def get_imported_file(self):
-        return self.importedFilename
-
-    def get_oscillogram(self):
-        print("Otrzymano sygnał")
-        self.sigSendingOscillogram.emit(self.oscillogram.get_widget())
-        print("Wysyłam oscylogram")
+        self.data = csv.csv_import(filename)
+        self.sigSendingDataframe.emit(self.data)
 
     def run_ica(self):
         pass
-
-    def get_last_selection_range(self):
-        self.confirmedSelectionBegin = self.lastSelectionBegin
-        self.confirmedSelectionEnd = self.lastSelectionEnd
-        self.sigLastSelectedRange.emit(self.confirmedSelectionBegin, self.confirmedSelectionEnd)
 
     def set_sample_num(self, value):
         self.sampleNum = value
@@ -56,7 +44,7 @@ class RichICA(QThread):
         self.sampling = value
 
     def set_confirmed_selection_begin(self, value):
-        self.confirmedSelectionBegin = value
+        self.selectionBegin = value
 
     def set_confirmed_selection_end(self, value):
-        self.confirmedSelectionEnd = value
+        self.selectionEnd = value

@@ -15,12 +15,12 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import front.import_browser as import_browser
 import front.export_browser as export_browser
 import front.oscillogramMpl as oscillogramMpl
+import pandas as pd
+
 
 class Ui_MainWindow(object):
 
-
     def setupUi(self, MainWindow):
-
         super(Ui_MainWindow, self).__init__()
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1017, 831)
@@ -166,16 +166,9 @@ class Ui_MainWindow(object):
         self.pButtnExport.setMaximumSize(QtCore.QSize(16777215, 50))
         self.pButtnExport.setObjectName("pButtnExport")
         self.verticalLayout_3.addWidget(self.pButtnExport)
-        self.pButtnSel = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pButtnSel.sizePolicy().hasHeightForWidth())
-        self.pButtnSel.setSizePolicy(sizePolicy)
-        self.pButtnSel.setMinimumSize(QtCore.QSize(0, 50))
-        self.pButtnSel.setMaximumSize(QtCore.QSize(16777215, 50))
-        self.pButtnSel.setObjectName("pButtnSel")
-        self.verticalLayout_3.addWidget(self.pButtnSel)
         self.pButtnICARun = QtWidgets.QPushButton(self.frameButtons)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -226,7 +219,6 @@ class Ui_MainWindow(object):
         self.frameParSampleNum.setFrameStyle(QFrame.NoFrame)
         self.prepare_oscillogram()
 
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "ICA - GUI"))
@@ -238,9 +230,7 @@ class Ui_MainWindow(object):
         self.labelSelBeg.setText(_translate("MainWindow", "Początek zaznaczenia"))
         self.pButtnImport.setText(_translate("MainWindow", "Import..."))
         self.pButtnExport.setText(_translate("MainWindow", "Eksport..."))
-        self.pButtnSel.setText(_translate("MainWindow", "Wskaż fragment"))
         self.pButtnICARun.setText(_translate("MainWindow", "Uruchom ICA"))
-
 
     def prepare_oscillogram(self):
         pass
@@ -266,13 +256,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     sigSelBegSet = pyqtSignal(float)
     sigSelEndSet = pyqtSignal(float)
 
-
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.ui.pButtnSel.clicked.connect(self.on_click_pButtnSel)
         self.ui.pButtnImport.clicked.connect(self.on_click_pButtnImport)
         self.ui.pButtnExport.clicked.connect(self.on_click_pButtnExport)
         self.ui.pButtnICARun.clicked.connect(self.on_click_pButtnICARun)
@@ -293,6 +281,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.sigImportFileRequest.emit(value)
         print("Importing file:", value)
 
+    def update_oscillogram_content(self, dataframe: pd.DataFrame):
+        print(dataframe)
+        self.ui.oscillogramPyPlot.updateOscillogram(dataframe)
+
     def on_click_pButtnExport(self):
         self.exportBrowserWindow = export_browser.Ui_QDialogExportBrowser()
         self.exportBrowserWindow.show()
@@ -303,15 +295,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print("Need to save ", value)  # DZIAŁA
         # Tutaj wstawić metodę, która przekazuje wartość do pliku .csv
 
-    def on_click_pButtnSel(self):
-        self.sigProvideSelectedRangeRequest.emit()
-        print("Wciśnięto wskaż fragment")
-
-
     def on_click_pButtnICARun(self):
         print("Zażądano uruchomienia algorytmu ICA")
         self.sigIcaRunningRequest.emit()
-
 
     def vchange_SelBeg(self, value):
         self.sigSelBegSet.emit(value)
